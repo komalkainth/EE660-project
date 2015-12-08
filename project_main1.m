@@ -31,7 +31,7 @@ for j=1:31
     end
 end
 
-%features = [ones(row_class,1),features];
+features = [ones(row_class,1),features];
 
 %least square
 
@@ -58,63 +58,66 @@ end
 end
    err_rate= (count/row_class)*100;
    
-   
+%logistic regression   
+[model_logR, X, lambdaVec, opt] = logregFit(features, class_mat, 'lambda','5');
 
+ yhat_logreg=logregPredict(model_logR,features);
+ 
+ count=0;
+ for i=1:row_class
 
-% %ridge regression
-%seperating validation set and data set
-% class_validation=zeros(4002,1);
-% 
-%  validation_set(1:2000,:)=features(1:2000,:);
-%  class_validation(1:2000)=class_mat(1:2000);
-%  validation_set(2001:4002,:)=features(10000:12001,:);
-%  class_validation(2001:4002)=class_mat(10000:12001);
-%  training_set=features(2001:9999,:);
-%  class_training=class_mat(2001:9999);
-%  %class_training=cell2mat(class_training);
-%  %class_validation=cell2mat(class_validation);
-%  
-% k=0.1:0.2:100;
-% b_ridge=ridge(class_training,training_set,k);
-% 
-% % validation
-% [m, n]=size(k);
-% for i=1:n
-%     
-% result(:,i)=validation_set*b_ridge(:,i);
-% end
-% 
-% result=sign(result);
-% count_ridge=zeros(n,1);
-% 
-% 
-% for j=1:n
-% for i=1:4002
-% if result(i,j)==class_validation(i,1)
-%     count_ridge(j,1)=count_ridge(j,1)+0;
-% else
-%     count_ridge(j,1)=count_ridge(j,1)+1;
-% end
-% end
-% end
-% 
-% error_function=(count_ridge/4002)*100;
-% error_ridge=min(error_function);
-
-k = 0:1e-5:5e-3;
-b_ridge=ridge(class_mat,features,k);
-result=features*b;
-result=sign(result);
-count1=0;
-for i=1:12001
-    if result(i,1)==class_mat(i)
-    count1=count1+0;
-    else
-        count1=count1+1;
-    end
+if (class_mat(i)==(yhat_logreg(i)))
+    count=count+0;
+else
+    count=count+1;
+end 
 end
+   err_rate= (count/row_class)*100;
+ 
+   %svm linear 
+   model_SVMLin=svmFit(features,class_mat);
+   yhat_SVMlin=svmPredict(model_SVMLin,features);
+   
+ count=0;
+ for i=1:row_class
 
+if (class_mat(i)==(yhat_SVMlin(i)))
+    count=count+0;
+else
+    count=count+1;
+end 
+end
+   err_rate= (count/row_class)*100;
+   
+   %svm rbf
+   model_SVMrbf=svmFit(features,class_mat);
+   yhat_SVMlin=svmPredict(model_SVMrbf,features);
+   
+ count=0;
+ for i=1:row_class
 
+if (class_mat(i)==(yhat_SVMrbf(i)))
+    count=count+0;
+else
+    count=count+1;
+end 
+end
+   err_rate= (count/row_class)*100;
+   
+   %forest
+   
+  model_forest=fitForest(features,class_mat);
+   yhat_forest=predictForest(model_forest,features);
+   
+ count=0;
+ for i=1:row_class
 
-
+if (class_mat(i)==(yhat_forest(i)))
+    count=count+0;
+else
+    count=count+1;
+end 
+end
+   err_rate= (count/row_class)*100; 
+   
         
